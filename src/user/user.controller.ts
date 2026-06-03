@@ -13,11 +13,11 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import type { User } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/user.dto';
 
 // 这里 'user' 是路由前缀，表示这个控制器中的所有路由都会以 /user 开头。
 // @Controller({ path: 'user', version: '1' }) 也可以指定版本号路由会变成 /v1/user
-@Controller('users')
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
