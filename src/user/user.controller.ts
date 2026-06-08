@@ -10,16 +10,26 @@ import {
   Delete,
   HttpStatus,
   HttpCode,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import type { User } from './user.service';
 import { CreateUserDto } from './dto/user.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 // 这里 'user' 是路由前缀，表示这个控制器中的所有路由都会以 /user 开头。
 // @Controller({ path: 'user', version: '1' }) 也可以指定版本号路由会变成 /v1/user
 @Controller('user')
+@UseGuards(AuthGuard) // 保护整个控制器，所有路由都需要认证
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('info')
+  getInfo(@Request() req: any) {
+    // req.user 包含用户信息
+    return req.user;
+  }
 
   @Get()
   findAll(): User[] {
