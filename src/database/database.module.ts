@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DatabaseService } from './database.service';
 
 @Module({
   providers: [
@@ -27,6 +28,6 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     },
   ],
-  exports: ['DATABASE_CONNECTION'],
+  exports: ['DATABASE_CONNECTION', DatabaseService],
 })
 export class DatabaseModule {}

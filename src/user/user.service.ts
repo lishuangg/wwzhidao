@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 export interface User {
   id: number;
@@ -31,8 +32,21 @@ export class UserService {
   ];
 
   // @Inject() 是一个依赖注入（Dependency Injection）装饰器，用于将外部资源（如服务、配置等）注入到类的构造函数中。在这个例子中，我们使用 @Inject('DATABASE_CONNECTION') 来注入一个名为 'DATABASE_CONNECTION' 的依赖项，这个依赖项是在 DatabaseModule 中提供的数据库连接配置。
-  constructor(@Inject('DATABASE_CONNECTION') private readonly dbConfig: any) {
+  constructor(
+    @Inject('DATABASE_CONNECTION') private readonly dbConfig: any, 
+    private configService: ConfigService
+  ) {
     console.log('Database Config:', this.dbConfig);
+    console.log('Config Service:', this.configService);
+  }
+
+  someMethod() {
+    const dbUri = this.configService.get<string>('MONGODB_URI');
+    const port = this.configService.get<number>('PORT', 3000);
+    console.log('Database URI:', dbUri);
+    console.log('Application Port:', port);
+    // const apiKey = this.configService.getOrThrow<string>('API_KEY');
+    // getOrThrow: 如果不存在，会抛出异常
   }
 
   findAll(): User[] {

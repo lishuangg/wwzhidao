@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './common/filter/all-exceptions.filter';
 import * as express from 'express';
 
 async function bootstrap() {
@@ -16,6 +17,8 @@ async function bootstrap() {
       },
     }),
   );
+
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
