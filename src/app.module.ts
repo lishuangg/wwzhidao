@@ -9,14 +9,14 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { InterviewModule } from './interview/interview.module';
 import { DatabaseModule } from './database/database.module';
+import { CommonModule } from './common/common.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logger.interceptor';
 import { AdminController } from './admin/admin.controller';
-import { JwtAuthGuard } from './auth/jwt-auth.grard';
-import { AllExceptionsFilter } from './common/filter/all-exceptions.filter';
+// import { JwtAuthGuard } from './auth/jwt-auth.grard';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { configSchema } from './config/config.schema';
-import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -42,6 +42,7 @@ import { DatabaseModule } from './database/database.module';
     UserModule,
     InterviewModule,
     DatabaseModule,
+    CommonModule,
   ],
   controllers: [AppController, AdminController],
   providers: [

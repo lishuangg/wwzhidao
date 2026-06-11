@@ -4,6 +4,7 @@ import { DatabaseService } from './database.service';
 
 @Module({
   providers: [
+    DatabaseService,
     {
       provide: 'DATABASE_CONNECTION',
       useFactory: (configService: ConfigService) => {
