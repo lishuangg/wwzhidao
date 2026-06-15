@@ -38,7 +38,7 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
-  @Post()
+  @Post('register')
   create(@Body() createUserDto: Omit<User, 'id' | 'createdAt'>): Promise<User> {
     return this.userService.create(createUserDto);
   }

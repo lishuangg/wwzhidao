@@ -111,6 +111,16 @@ UserSchema.post('save', function(doc) {
   console.log(`用户 ${doc.username} 已保存到数据库`);
 })
 
+UserSchema.pre('findOneAndUpdate', function() {
+  this.set({ updateAt: new Date()})
+})
+
 UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password);
+}
+
+UserSchema.methods.toJSON = function() {
+  const obj = this.toObject();
+  delete obj.password; // 删除密码字段
+  return obj;
 }
