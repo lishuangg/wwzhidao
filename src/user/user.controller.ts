@@ -12,48 +12,34 @@ import {
   HttpCode,
   UseGuards,
   Request,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import type { User } from './user.service';
 import { CreateUserDto } from './dto/user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.grard';
+import { LoggingInterceptor } from 'src/common/interceptors/logger.interceptor';
+import { User } from './schemas/user.schema';
 
-// 这里 'user' 是路由前缀，表示这个控制器中的所有路由都会以 /user 开头。
-// @Controller({ path: 'user', version: '1' }) 也可以指定版本号路由会变成 /v1/user
 @Controller('user')
-// @UseGuards(AuthGuard, JwtAuthGuard) // 保护整个控制器，所有路由都需要认证
+@UseInterceptors(LoggingInterceptor) // 使用 LoggingInterceptor 拦截器
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Get('info')
-  getInfo(@Request() req: any) {
-    // req.user 包含用户信息
-    return req.user;
-  }
-
   @Get()
-  findAll(): User[] {
+  findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
 
-  @Get('error')
-  testError() {
-    throw new Error('这是一个测试错误');
-  }
-
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): User {
-    const user = this.userService.findOne(id);
-    if (!user) {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<User | null> {
+    if(id > 100) {
       throw new NotFoundException(`用户 ID ${id} 不存在`);
     }
-    return user;
+    return this.userService.findOne(id);
   }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): User {
-    // 请求数据不符合要求，NestJS 会自动返回 400 错误
+  create(@Body() createUserDto: Omit<User, 'id' | 'createdAt'>): Promise<User> {
     return this.userService.create(createUserDto);
   }
 
@@ -61,20 +47,72 @@ export class UserController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: { name?: string; email?: string },
-  ): User {
-    const user = this.userService.update(id, updateUserDto);
-    if (!user) {
-      throw new NotFoundException(`用户 ID ${id} 不存在`);
-    }
-    return user;
+  ): Promise<User | null> {
+    return this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number): void {
-    const success = this.userService.delete(id);
-    if (!success) {
-      throw new NotFoundException(`用户 ID ${id} 不存在`);
-    }
+  delete(@Param('id', ParseIntPipe) id: number): Promise<User | null> {
+    return this.userService.delete(id.toString());
   }
 }
+
+// // 这里 'user' 是路由前缀，表示这个控制器中的所有路由都会以 /user 开头。
+// // @Controller({ path: 'user', version: '1' }) 也可以指定版本号路由会变成 /v1/user
+// @Controller('user')
+// // @UseGuards(AuthGuard, JwtAuthGuard) // 保护整个控制器，所有路由都需要认证
+// export class UserController {
+//   constructor(private readonly userService: UserService) {}
+
+//   @Get('info')
+//   getInfo(@Request() req: any) {
+//     // req.user 包含用户信息
+//     return req.user;
+//   }
+
+//   @Get()
+//   findAll(): User[] {
+//     return this.userService.findAll();
+//   }
+
+//   @Get('error')
+//   testError() {
+//     throw new Error('这是一个测试错误');
+//   }
+
+//   @Get(':id')
+//   findOne(@Param('id', ParseIntPipe) id: number): User {
+//     const user = this.userService.findOne(id);
+//     if (!user) {
+//       throw new NotFoundException(`用户 ID ${id} 不存在`);
+//     }
+//     return user;
+//   }
+
+//   @Post()
+//   create(@Body() createUserDto: CreateUserDto): User {
+//     // 请求数据不符合要求，NestJS 会自动返回 400 错误
+//     return this.userService.create(createUserDto);
+//   }
+
+//   @Put(':id')
+//   update(
+//     @Param('id', ParseIntPipe) id: number,
+//     @Body() updateUserDto: { name?: string; email?: string },
+//   ): User {
+//     const user = this.userService.update(id, updateUserDto);
+//     if (!user) {
+//       throw new NotFoundException(`用户 ID ${id} 不存在`);
+//     }
+//     return user;
+//   }
+
+//   @Delete(':id')
+//   @HttpCode(HttpStatus.NO_CONTENT)
+//   remove(@Param('id', ParseIntPipe) id: number): void {
+//     const success = this.userService.delete(id);
+//     if (!success) {
+//       throw new NotFoundException(`用户 ID ${id} 不存在`);
+//     }
+//   }
+// }
